@@ -7,4 +7,4 @@
 - Preview:
 
   
-  <img src="https://github.com/ScottT4-Tuan/Smart-Parking-System/assets/141108181/30d1230e-51eb-4bf1-a74e-567e27f6ce4f" width="300" height="800">
+  <img src="https://github.com/ScottT4-Tuan/Smart-Parking-System/assets/141108181/30d1230e-51eb-4bf1-a74e-567e27f6ce4f" width="300" height="600">
