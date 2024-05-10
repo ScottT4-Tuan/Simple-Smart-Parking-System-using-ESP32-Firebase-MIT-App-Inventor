@@ -1,0 +1,89 @@
+  #include <Arduino.h>
+  #include <WiFi.h>
+  #include <SoftwareSerial.h>
+  #include <Firebase_ESP_Client.h>
+  #include "addons/TokenHelper.h"
+  #include "addons/RTDBHelper.h"
+  #define WIFI_SSID "Scott"
+  #define WIFI_PASSWORD "12345678"
+  #define API_KEY "YOUR_API_KEY"
+  #define DATABASE_URL "https://YOUR_DATABASE_URL io.com/" 
+  FirebaseData fbdo;
+  FirebaseAuth auth;
+  FirebaseConfig config;
+
+  bool signupOK = false;  
+  int state; 
+  String input; 
+
+  const int IR_1 = 25; 
+  const int IR_2 = 26; 
+  const int IR_3 = 27; 
+  int state_1;
+  int preState_1; 
+  int state_2; 
+  int preState_2;
+  int state_3; 
+  int preState_3; 
+  void setup() {
+    // put your setup code here, to run once:
+    Serial.begin(9600);
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    while (WiFi.status() != WL_CONNECTED){
+      delay(300);
+    }
+    config.api_key = API_KEY;
+    config.database_url = DATABASE_URL;
+    if (Firebase.signUp(&config, &auth, "", "")){
+      signupOK = true;
+    }
+    /* Assign the callback function for the long running token generation task */
+    config.token_status_callback = tokenStatusCallback; //see addons/TokenHelper.h
+    
+    Firebase.begin(&config, &auth);
+    Firebase.reconnectWiFi(true);
+    pinMode(IR_1, INPUT);
+    pinMode(IR_2, INPUT);
+    pinMode(IR_3, INPUT);
+  }
+
+  void loop() {
+    // put your main code here, to run repeatedly:
+    send1();
+    send2();
+    send3();
+    delay(1000);
+  }
+  void send1(){
+    if (digitalRead(IR_1) == LOW) state_1 = 11;
+    else state_1 = 10;
+    if (state_1 != preState_1){
+      if (Firebase.ready() && signupOK){
+        Firebase.RTDB.setInt(&fbdo, "Slot 1", state_1 % 10);
+        // Serial.println("Slot 1: " + state_1);
+        preState_1 = state_1; 
+      }
+    }
+  }
+  void send2(){
+    if (digitalRead(IR_2) == LOW) state_2 = 21;
+    else state_2 = 20;
+    if (state_2 != preState_2){
+      if (Firebase.ready() && signupOK){
+        Firebase.RTDB.setInt(&fbdo, "Slot 2", state_2 % 10);
+        // Serial.println("Slot 2: " + state_2);
+        preState_2 = state_2; 
+      }
+    }
+  }
+  void send3(){
+    if (digitalRead(IR_3) == LOW) state_3 = 31;
+    else state_3 = 30;
+    if (state_3 != preState_3){
+      if (Firebase.ready() && signupOK){
+        Firebase.RTDB.setInt(&fbdo, "Slot 3", state_3 % 10);
+        // Serial.println("Slot 3: " + state_3);
+        preState_3 = state_3; 
+      }
+    }
+  }
